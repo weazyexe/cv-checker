@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">cvchecker</string>
+
+    <string name="email">E-mail</string>
+    <string name="password">Password</string>
+    <string name="scan">Сканировать</string>
+    <string name="all_participants">Зрители</string>
+    <string name="add">Add</string>
+    <string name="error_text">Error bruh, I dunno what is this</string>
+    <string name="login">Войти</string>
+    <string name="login_error">Неудачная попытка входа. Проблема с интернетом или неверный логин / пароль</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="viewer_info">Информация</string>
+    <string name="not_found">Зритель не найден</string>
+    <string name="bold_dot">•</string>
+    <string name="search">Поиск</string>
+</resources>
