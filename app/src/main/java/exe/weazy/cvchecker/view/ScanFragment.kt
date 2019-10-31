@@ -111,6 +111,7 @@ class ScanFragment : Fragment(){
                 val viewer = presenter.findViewer(it.text)
 
                 if (viewer != null) {
+                    presenter.addVisit(viewer)
                     val dialog = buildViewerDialog(viewer, requireActivity())
                     dialog.show()
                 } else {

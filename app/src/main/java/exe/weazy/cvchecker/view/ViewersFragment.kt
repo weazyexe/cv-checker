@@ -177,7 +177,7 @@ class ViewersFragment : Fragment(), MainContract.View {
         layout_content.visibility = View.GONE
 
         if (msg != null) {
-            Snackbar.make(layout_main, msg, Snackbar.LENGTH_LONG).show()
+            showSnackbar(msg)
         }
     }
 
@@ -208,5 +208,9 @@ class ViewersFragment : Fragment(), MainContract.View {
         layout_error.visibility = View.GONE
         layout_loading.visibility = View.GONE
         layout_content.visibility = View.VISIBLE
+    }
+
+    override fun showSnackbar(msg: String) {
+        Snackbar.make(layout_content, msg, Snackbar.LENGTH_LONG).show()
     }
 }

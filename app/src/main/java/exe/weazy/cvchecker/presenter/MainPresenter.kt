@@ -1,20 +1,24 @@
 package exe.weazy.cvchecker.presenter
 
-import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.Timestamp
 import exe.weazy.cvchecker.arch.MainContract
 import exe.weazy.cvchecker.entity.Viewer
+import exe.weazy.cvchecker.entity.Visit
 import exe.weazy.cvchecker.model.MainModel
 import java.util.*
 
 class MainPresenter : MainContract.Presenter, MainContract.LoadingListener {
 
-    private var viewers = mutableListOf<Viewer>()
+    private val viewers = mutableListOf<Viewer>()
     private var currentViewers = mutableListOf<Viewer>()
+    private val todayVisits = mutableListOf<Visit>()
 
     private val model = MainModel(this)
     private lateinit var view : MainContract.View
 
 
+
+    override fun getCurrentViewer(position: Int) = currentViewers[position]
 
     override fun attachView(view: MainContract.View) {
         this.view = view
@@ -24,9 +28,16 @@ class MainPresenter : MainContract.Presenter, MainContract.LoadingListener {
         if (isUpdate || viewers.isNullOrEmpty()) {
             view.showLoading()
             model.loadParticipants()
+            model.loadVisits()
         } else {
             view.showContent(viewers)
         }
+    }
+
+    override fun addVisit(viewer: Viewer) {
+        val visit = Visit(viewer, Timestamp(Date()))
+        todayVisits.add(visit)
+        model.updateVisits(todayVisits)
     }
 
     override fun uploadViewer(viewer: Viewer) {
@@ -70,5 +81,14 @@ class MainPresenter : MainContract.Presenter, MainContract.LoadingListener {
         view.showError(t.message)
     }
 
-    override fun getCurrentViewer(position: Int) = currentViewers[position]
+    override fun onVisitsLoadSuccess(data: List<Visit>) {
+        todayVisits.clear()
+        todayVisits.addAll(data)
+    }
+
+    override fun onVisitsLoadFailure(t: Throwable) {
+        if (t.message != null) {
+            view.showSnackbar(t.message!!)
+        }
+    }
 }

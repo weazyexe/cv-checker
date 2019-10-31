@@ -1,6 +1,7 @@
 package exe.weazy.cvchecker.arch
 
 import exe.weazy.cvchecker.entity.Viewer
+import exe.weazy.cvchecker.entity.Visit
 import java.util.*
 
 interface MainContract {
@@ -8,6 +9,7 @@ interface MainContract {
         fun showLoading()
         fun showError(msg: String?)
         fun showContent(data: List<Viewer>)
+        fun showSnackbar(msg: String)
     }
 
     interface Presenter {
@@ -17,17 +19,21 @@ interface MainContract {
         fun search(query: String)
         fun getCurrentViewer(position : Int) : Viewer
         fun uploadViewer(viewer : Viewer)
+        fun addVisit(viewer: Viewer)
     }
 
     interface Model {
         fun loadParticipants()
-        fun loadScanStats()
+        fun loadVisits()
         fun uploadViewer(viewer: Viewer)
-        fun uploadScanStats(viewer: Viewer, date: Date)
+        fun updateVisits(visits: List<Visit>)
     }
 
     interface LoadingListener {
         fun onParticipantsLoadSuccess(data: List<Viewer>)
         fun onParticipantsLoadFailure(t: Throwable)
+
+        fun onVisitsLoadSuccess(data: List<Visit>)
+        fun onVisitsLoadFailure(t: Throwable)
     }
 }
