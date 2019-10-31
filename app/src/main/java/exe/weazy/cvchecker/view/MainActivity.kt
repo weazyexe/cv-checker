@@ -5,6 +5,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
+import com.budiyev.android.codescanner.CodeScanner
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import exe.weazy.cvchecker.R
 import exe.weazy.cvchecker.util.hideKeyboard
@@ -29,14 +30,18 @@ class MainActivity : AppCompatActivity() {
             R.id.navigation_scan -> {
                 newPosition = 0
                 if (startingPosition != newPosition) {
+                    viewersFragment.onPause()
                     changeFragment(scanFragment)
+                    scanFragment.onResume()
                 }
                 return@OnNavigationItemSelectedListener true
             }
             R.id.navigation_viewers -> {
                 newPosition = 1
                 if (startingPosition != newPosition) {
+                    scanFragment.onPause()
                     changeFragment(viewersFragment)
+                    viewersFragment.onResume()
                 }
                 return@OnNavigationItemSelectedListener true
             }

@@ -8,11 +8,12 @@ import java.util.*
 
 class MainPresenter : MainContract.Presenter, MainContract.LoadingListener {
 
-    private var viewers : MutableList<Viewer> = mutableListOf()
+    private var viewers = mutableListOf<Viewer>()
+    private var currentViewers = mutableListOf<Viewer>()
 
     private val model = MainModel(this)
     private lateinit var view : MainContract.View
-    private lateinit var currentViewers : MutableList<Viewer>
+
 
 
     override fun attachView(view: MainContract.View) {
@@ -26,6 +27,14 @@ class MainPresenter : MainContract.Presenter, MainContract.LoadingListener {
         } else {
             view.showContent(viewers)
         }
+    }
+
+    override fun uploadViewer(viewer: Viewer) {
+        model.uploadViewer(viewer)
+        viewers.add(0, viewer)
+        currentViewers.add(0, viewer)
+
+        view.showContent(viewers)
     }
 
     override fun search(query: String) {
@@ -50,6 +59,8 @@ class MainPresenter : MainContract.Presenter, MainContract.LoadingListener {
     override fun onParticipantsLoadSuccess(data: List<Viewer>) {
         viewers.clear()
         viewers.addAll(data)
+        currentViewers.clear()
+        currentViewers.addAll(data)
 
 
         view.showContent(viewers)

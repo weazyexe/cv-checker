@@ -16,4 +16,10 @@
     <string name="not_found">Зритель не найден</string>
     <string name="bold_dot">•</string>
     <string name="search">Поиск</string>
+    <string name="name">Имя</string>
+    <string name="surname">Фамилия</string>
+    <string name="patronymic">Отчество</string>
+    <string name="add_info">Пожалуйста, введите данные нового зрителя</string>
+    <string name="add_error">Произошла ошибка при добавлении зрителя, повторите ещё раз</string>
+    <string name="uncorrect">Некорректное значение</string>
 </resources>

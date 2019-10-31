@@ -12,6 +12,11 @@ import exe.weazy.cvchecker.entity.Viewer
 import java.text.SimpleDateFormat
 import java.util.*
 
+val ADD_ACTIVITY_REQUEST_CODE = 700
+val ADD_ACTIVITY_RESULT_SUCCESS = 701
+val ADD_ACTIVITY_RESULT_FAILURE = 702
+
+
 fun buildViewerDialog(viewer: Viewer, activity: Activity) : AlertDialog {
 
     val builder: AlertDialog.Builder = activity.let {

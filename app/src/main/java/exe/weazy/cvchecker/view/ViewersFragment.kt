@@ -1,33 +1,33 @@
 package exe.weazy.cvchecker.view
 
-import android.annotation.SuppressLint
+import android.app.ActivityOptions
+import android.content.Intent
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.google.android.material.snackbar.Snackbar
-import com.google.firebase.firestore.FirebaseFirestore
 import exe.weazy.cvchecker.R
 import exe.weazy.cvchecker.adapter.ViewersAdapter
 import exe.weazy.cvchecker.adapter.ViewersDiffUtilCallback
 import exe.weazy.cvchecker.arch.MainContract
 import exe.weazy.cvchecker.entity.Rank
 import exe.weazy.cvchecker.entity.Viewer
+import exe.weazy.cvchecker.util.ADD_ACTIVITY_REQUEST_CODE
+import exe.weazy.cvchecker.util.ADD_ACTIVITY_RESULT_FAILURE
+import exe.weazy.cvchecker.util.ADD_ACTIVITY_RESULT_SUCCESS
 import exe.weazy.cvchecker.util.buildViewerDialog
 import exe.weazy.cvchecker.viewmodel.MainViewModel
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_viewers.*
 import java.util.*
-import kotlin.collections.ArrayList
-import kotlin.text.isEmpty as isEmpty1
 
 class ViewersFragment : Fragment(), MainContract.View {
 
@@ -124,9 +124,46 @@ class ViewersFragment : Fragment(), MainContract.View {
 
             }
         })
+
+        button_add.setOnClickListener {
+            val intent = Intent(activity, AddActivity::class.java)
+
+            val options = ActivityOptions.makeSceneTransitionAnimation(activity, button_add, "transition_fab")
+
+            startActivityForResult(intent, ADD_ACTIVITY_REQUEST_CODE, options.toBundle())
+        }
     }
 
 
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+
+        when (requestCode) {
+            ADD_ACTIVITY_REQUEST_CODE -> {
+                when (resultCode) {
+                    ADD_ACTIVITY_RESULT_SUCCESS -> {
+                        val extras = data?.extras
+                        if (data != null && extras != null) {
+                            val surname = extras["surname"] as String
+                            val name = extras["name"] as String
+                            val patronymic = extras["patronymic"] as String
+                            val email = extras["email"] as String
+
+                            val uid = (Date().time / 1000).toString(16).toUpperCase(Locale.getDefault())
+
+                            presenter.uploadViewer(Viewer(name, surname, patronymic, uid, Rank.VIEWER, email))
+                        } else {
+                            Snackbar.make(layout_content, R.string.add_error, Snackbar.LENGTH_LONG).show()
+                        }
+                    }
+
+                    ADD_ACTIVITY_RESULT_FAILURE -> {
+                        Snackbar.make(layout_content, R.string.add_error, Snackbar.LENGTH_LONG).show()
+                    }
+                }
+            }
+        }
+    }
 
     override fun showLoading() {
         layout_error.visibility = View.GONE
@@ -161,7 +198,6 @@ class ViewersFragment : Fragment(), MainContract.View {
             rv_viewers.adapter = adapter
             rv_viewers.layoutManager = LinearLayoutManager(requireContext())
         } else {
-
             val diffUtilCallback = ViewersDiffUtilCallback(adapter.viewers, data)
             val diffUtilResult = DiffUtil.calculateDiff(diffUtilCallback, false)
 

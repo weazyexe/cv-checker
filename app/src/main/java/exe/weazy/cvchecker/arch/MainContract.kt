@@ -1,6 +1,7 @@
 package exe.weazy.cvchecker.arch
 
 import exe.weazy.cvchecker.entity.Viewer
+import java.util.*
 
 interface MainContract {
     interface View {
@@ -15,10 +16,14 @@ interface MainContract {
         fun findViewer(uid: String) : Viewer?
         fun search(query: String)
         fun getCurrentViewer(position : Int) : Viewer
+        fun uploadViewer(viewer : Viewer)
     }
 
     interface Model {
         fun loadParticipants()
+        fun loadScanStats()
+        fun uploadViewer(viewer: Viewer)
+        fun uploadScanStats(viewer: Viewer, date: Date)
     }
 
     interface LoadingListener {
