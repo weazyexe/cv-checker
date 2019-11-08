@@ -2,6 +2,7 @@ package exe.weazy.cvchecker.view
 
 import android.os.Bundle
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProviders
@@ -30,7 +31,7 @@ class MainActivity : AppCompatActivity() {
             R.id.navigation_scan -> {
                 newPosition = 0
                 if (startingPosition != newPosition) {
-                    viewersFragment.onPause()
+                    //viewersFragment.onPause()
                     changeFragment(scanFragment)
                     scanFragment.onResume()
                 }
@@ -41,7 +42,7 @@ class MainActivity : AppCompatActivity() {
                 if (startingPosition != newPosition) {
                     scanFragment.onPause()
                     changeFragment(viewersFragment)
-                    viewersFragment.onResume()
+                    //viewersFragment.onResume()
                 }
                 return@OnNavigationItemSelectedListener true
             }
@@ -86,6 +87,13 @@ class MainActivity : AppCompatActivity() {
         } else {
             super.onBackPressed()
         }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+
+        outState.putInt("new_position", newPosition)
+        outState.putInt("starting_position", startingPosition)
     }
 
     private fun loadFragments() {

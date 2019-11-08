@@ -8,6 +8,7 @@ import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProviders
@@ -20,19 +21,19 @@ import exe.weazy.cvchecker.adapter.ViewersDiffUtilCallback
 import exe.weazy.cvchecker.arch.MainContract
 import exe.weazy.cvchecker.entity.Rank
 import exe.weazy.cvchecker.entity.Viewer
+import exe.weazy.cvchecker.presenter.MainPresenter
 import exe.weazy.cvchecker.util.ADD_ACTIVITY_REQUEST_CODE
 import exe.weazy.cvchecker.util.ADD_ACTIVITY_RESULT_FAILURE
 import exe.weazy.cvchecker.util.ADD_ACTIVITY_RESULT_SUCCESS
 import exe.weazy.cvchecker.util.buildViewerDialog
 import exe.weazy.cvchecker.viewmodel.MainViewModel
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_viewers.*
 import java.util.*
 
 class ViewersFragment : Fragment(), MainContract.View {
 
     private lateinit var viewModel: MainViewModel
-    private lateinit var presenter: MainContract.Presenter
+    lateinit var presenter: MainPresenter
 
     private lateinit var adapter: ViewersAdapter
 
@@ -102,7 +103,6 @@ class ViewersFragment : Fragment(), MainContract.View {
     }
 }*/
     }
-
 
     override fun onStart() {
         super.onStart()
@@ -184,33 +184,42 @@ class ViewersFragment : Fragment(), MainContract.View {
     override fun showContent(data: List<Viewer>) {
 
         if (!::adapter.isInitialized) {
-
-            val onItemClickListener = View.OnClickListener {
-                val position = rv_viewers.getChildAdapterPosition(it)
-                val viewer = presenter.getCurrentViewer(position)
-
-                val dialog = buildViewerDialog(viewer, requireActivity())
-                dialog.show()
-            }
-
-            adapter = ViewersAdapter(data.toMutableList(), onItemClickListener)
+            adapter = ViewersAdapter(data.toMutableList(), onItemClickListener())
 
             rv_viewers.adapter = adapter
             rv_viewers.layoutManager = LinearLayoutManager(requireContext())
         } else {
             val diffUtilCallback = ViewersDiffUtilCallback(adapter.viewers, data)
-            val diffUtilResult = DiffUtil.calculateDiff(diffUtilCallback, false)
+            val diffUtilResult = DiffUtil.calculateDiff(diffUtilCallback)
 
             adapter.setViewers(data)
+            //adapter.notifyDataSetChanged()
             diffUtilResult.dispatchUpdatesTo(adapter)
+
+            /*rv_viewers.adapter = adapter
+            rv_viewers.layoutManager = LinearLayoutManager(requireContext())*/
         }
+
 
         layout_error.visibility = View.GONE
         layout_loading.visibility = View.GONE
         layout_content.visibility = View.VISIBLE
+
     }
 
     override fun showSnackbar(msg: String) {
         Snackbar.make(layout_content, msg, Snackbar.LENGTH_LONG).show()
+    }
+
+    override fun showToast(msg: String) {
+        Toast.makeText(requireContext(), msg, Toast.LENGTH_LONG).show()
+    }
+
+    private fun onItemClickListener() = View.OnClickListener {
+        val position = rv_viewers.getChildAdapterPosition(it)
+        val viewer = presenter.getCurrentViewer(position)
+
+        val dialog = buildViewerDialog(viewer, requireActivity())
+        dialog.show()
     }
 }

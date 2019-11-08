@@ -1,10 +1,8 @@
 package exe.weazy.cvchecker.model
 
+import android.widget.Toast
 import com.google.firebase.Timestamp
-import com.google.firebase.firestore.DocumentReference
-import com.google.firebase.firestore.FirebaseFirestore
-import com.google.firebase.firestore.Query
-import com.google.firebase.firestore.SetOptions
+import com.google.firebase.firestore.*
 import exe.weazy.cvchecker.arch.MainContract
 import exe.weazy.cvchecker.entity.Viewer
 import exe.weazy.cvchecker.entity.Rank
@@ -101,20 +99,27 @@ class MainModel(private val presenter : MainPresenter) : MainContract.Model {
         firestore.document("viewers/${viewer.uid}").set(viewer)
     }
 
-    override fun updateVisits(visits: List<Visit>) {
+    override fun uploadVisit(visit: Visit) {
         val day = Calendar.getInstance().get(Calendar.DAY_OF_MONTH)
         val month = Calendar.getInstance().get(Calendar.MONTH) + 1
 
-        val firestoreVisits = mutableListOf<FirestoreVisit>()
+        /*val firestoreVisits = mutableListOf<FirestoreVisit>()
 
         visits.forEach {
-            firestoreVisits.add(FirestoreVisit(firestore.document("viewers/${it.viewer.uid}"), it.date))
+            firestoreVisits.add()
+        }*/
+
+        val fVisit = FirestoreVisit(firestore.document("viewers/${visit.viewer.uid}"), visit.date)
+        /*val result = mutableMapOf<String, List<FirestoreVisit>>()
+        result["visits"] = firestoreVisits*/
+
+        firestore.document("visits/$day.$month").update("visits", FieldValue.arrayUnion(fVisit)).addOnCompleteListener {
+            if (it.isSuccessful) {
+                presenter.onVisitsUpdateSuccess()
+            } else {
+                presenter.onVisitsUpdateFailure(Throwable("Visit can't write"))
+            }
         }
-
-        val result = mutableMapOf<String, List<FirestoreVisit>>()
-        result["visits"] = firestoreVisits
-
-        firestore.document("visits/$day.$month").set(result, SetOptions.merge())
     }
 
     private data class FirestoreVisit(val viewer: DocumentReference, val timestamp: Timestamp)

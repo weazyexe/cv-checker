@@ -1,5 +1,7 @@
 package exe.weazy.cvchecker.presenter
 
+import android.content.Context
+import android.widget.Toast
 import com.google.firebase.Timestamp
 import exe.weazy.cvchecker.arch.MainContract
 import exe.weazy.cvchecker.entity.Viewer
@@ -9,7 +11,7 @@ import java.util.*
 
 class MainPresenter : MainContract.Presenter, MainContract.LoadingListener {
 
-    private val viewers = mutableListOf<Viewer>()
+    val viewers = mutableListOf<Viewer>()
     private var currentViewers = mutableListOf<Viewer>()
     private val todayVisits = mutableListOf<Visit>()
 
@@ -30,14 +32,15 @@ class MainPresenter : MainContract.Presenter, MainContract.LoadingListener {
             model.loadParticipants()
             model.loadVisits()
         } else {
-            view.showContent(viewers)
+            view.showContent(currentViewers)
         }
     }
 
     override fun addVisit(viewer: Viewer) {
         val visit = Visit(viewer, Timestamp(Date()))
         todayVisits.add(visit)
-        model.updateVisits(todayVisits)
+        //model.updateVisits(todayVisits)
+        model.uploadVisit(visit)
     }
 
     override fun uploadViewer(viewer: Viewer) {
@@ -73,7 +76,6 @@ class MainPresenter : MainContract.Presenter, MainContract.LoadingListener {
         currentViewers.clear()
         currentViewers.addAll(data)
 
-
         view.showContent(viewers)
     }
 
@@ -90,5 +92,13 @@ class MainPresenter : MainContract.Presenter, MainContract.LoadingListener {
         if (t.message != null) {
             view.showSnackbar(t.message!!)
         }
+    }
+
+    override fun onVisitsUpdateSuccess() {
+        view.showToast("Write visit is successful")
+    }
+
+    override fun onVisitsUpdateFailure(t: Throwable) {
+        view.showToast("Write visit is failure: ${t.message}")
     }
 }

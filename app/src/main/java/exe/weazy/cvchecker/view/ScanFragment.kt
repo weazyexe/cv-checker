@@ -53,40 +53,37 @@ class ScanFragment : Fragment(){
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        val activity = requireActivity()
+        requestCameraPermissions()
+    }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA)
-                != PackageManager.PERMISSION_GRANTED) {
-
-                if (ActivityCompat.shouldShowRequestPermissionRationale(activity,
-                        Manifest.permission.CAMERA)) {
-                    // Show an explanation to the user *asynchronously* -- don't block
-                    // this thread waiting for the user's response! After the user
-                    // sees the explanation, try again to request the permission.
-                } else {
-                    // No explanation needed, we can request the permission.
-                    ActivityCompat.requestPermissions(activity,
-                        arrayOf(Manifest.permission.CAMERA), 112)
-
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        when (requestCode) {
+            112 -> {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     initScanner()
                 }
-
-            } else {
-                initScanner()
             }
-        } else {
-            initScanner()
         }
     }
 
     override fun onResume() {
         super.onResume()
-        codeScanner.startPreview()
+        if (::codeScanner.isInitialized) {
+            codeScanner.startPreview()
+        } else {
+            requestCameraPermissions()
+        }
+
     }
 
     override fun onPause() {
-        codeScanner.releaseResources()
+        if (::codeScanner.isInitialized) {
+            codeScanner.releaseResources()
+        }
         super.onPause()
     }
 
@@ -128,6 +125,22 @@ class ScanFragment : Fragment(){
 
         scannerView.setOnClickListener {
             codeScanner.startPreview()
+        }
+    }
+
+    private fun requestCameraPermissions() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+                != PackageManager.PERMISSION_GRANTED) {
+
+                ActivityCompat.requestPermissions(requireActivity(),
+                    arrayOf(Manifest.permission.CAMERA), 112)
+
+            } else {
+                initScanner()
+            }
+        } else {
+            initScanner()
         }
     }
 }

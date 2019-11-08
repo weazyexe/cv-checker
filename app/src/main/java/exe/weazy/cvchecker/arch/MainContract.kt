@@ -10,6 +10,7 @@ interface MainContract {
         fun showError(msg: String?)
         fun showContent(data: List<Viewer>)
         fun showSnackbar(msg: String)
+        fun showToast(msg: String)
     }
 
     interface Presenter {
@@ -26,7 +27,7 @@ interface MainContract {
         fun loadParticipants()
         fun loadVisits()
         fun uploadViewer(viewer: Viewer)
-        fun updateVisits(visits: List<Visit>)
+        fun uploadVisit(visit: Visit)
     }
 
     interface LoadingListener {
@@ -35,5 +36,8 @@ interface MainContract {
 
         fun onVisitsLoadSuccess(data: List<Visit>)
         fun onVisitsLoadFailure(t: Throwable)
+
+        fun onVisitsUpdateSuccess()
+        fun onVisitsUpdateFailure(t: Throwable)
     }
 }
